@@ -392,5 +392,5 @@ public class Goods implements  Comparable{
 
 ```
 
-![image-20220408200508307](java基础.assets\image-20220408200508307.png)
+![image-20220408200508307](java基础.assets/image-20220408200508307.png)
 
