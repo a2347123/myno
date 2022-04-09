@@ -75,8 +75,8 @@ git push -u origin master
 #解决方案2：
 #我们只需加上 –rebase 参数然后再重新 push 一次即可。
 
-git pull --rebase origin master #对应更新命令
-git push -u origin master #对应上传命令
+git pull --rebase origin master 	#对应更新命令！
+git push -u origin master #对应上传命令！
 #（tips：我一般使用第二种方法）
 ```
 
