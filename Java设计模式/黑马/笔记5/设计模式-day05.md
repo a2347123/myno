@@ -1302,7 +1302,7 @@ public class Animal {
         exe.execute(this);
     }
 }
-
+//下面这些子类中，其实可以不用写方法的，这里只是为了更好的理解
 public class Dog extends Animal {
     public void accept(Execute exe) {
         exe.execute(this);
