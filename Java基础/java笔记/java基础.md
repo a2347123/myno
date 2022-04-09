@@ -91,7 +91,11 @@ class Sub1  extends SuperClass implements CompareA,CompareB{
 
 # 2、内部类
 
-![image-20220407224053697](java基础.assets\image-20220407224053697-16493424545181.png)
+![](java基础.assets/image-20220407224053697-16493424545181.png)
+
+
+
+
 
 
 
