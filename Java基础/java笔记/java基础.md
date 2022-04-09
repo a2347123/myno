@@ -2,9 +2,9 @@
 
 1.1 JDK7之前，只能定义全局常量和抽象方法
 
-> 全局常量:`public static final` 修饰，书写时可以省略不写
+**全局常量:`public static final` 修饰，书写时可以省略不写**
 
-> 抽象方法:`public abstract`修饰
+**抽象方法:`public abstract`修饰**
 
 1.2 JDK8 除了定义全局常量和抽象方法之外，还可以定义静态方法、默认方法(略)
 
@@ -194,7 +194,7 @@ class Person{
 }
 ```
 
-# Comparable与Comparator
+# 3、Comparable与Comparator
 
 ```java
 package com.atguigu.java;
@@ -394,3 +394,20 @@ public class Goods implements  Comparable{
 
 ![image-20220408200508307](java基础.assets/image-20220408200508307.png)
 
+# 4、多态性的理解
+
+1、可以理解为一个事物的多种形态
+
+2、对象的多态性：父类的引用指向子类的对象(或子类的对象赋给父类的引用)
+
+3、多态的使用，虚拟方法调用
+
+​	有了对象的多态性以后，我们在编译期，只能调用父类中声明的方法，但在运行期，我们实际执行的是子类重写父类的方法。
+
+​	总结：编译,看左边;运行，看右边
+
+4、多态性的使用前提，
+
+​	4.1、类的继承关系
+
+​	4.2、方法的重写
