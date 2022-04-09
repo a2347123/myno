@@ -323,7 +323,7 @@ public class ClosingState extends LiftState {
 public class Context {
     //定义出所有的电梯状态
     public final static OpenningState openningState = new OpenningState();//开门状态，这时候电梯只能关闭
-    public final static ClosingState closeingState = new ClosingState();//关闭状态，这时候电梯可以运行、停止和开门
+    public final static ClosingState closeingState = new ClosingState();//关闭状态，这时候电梯可以运行、/停止和开门
     public final static RunningState runningState = new RunningState();//运行状态，这时候电梯只能停止
     public final static StoppingState stoppingState = new StoppingState();//停止状态，这时候电梯可以开门、运行
 
@@ -1041,7 +1041,7 @@ public class ArrayList<E> extends AbstractList<E>
 
 类图如下：
 
-![](img\访问者模式.png)
+![](img/访问者模式.png)
 
 代码如下：
 

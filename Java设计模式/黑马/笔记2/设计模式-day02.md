@@ -392,7 +392,7 @@ Collection接口是抽象工厂类，ArrayList是具体的工厂类；Iterator�
 
 接口类图如下：
 
-![](img\原型模式.png)
+![](img/原型模式.png)
 
 ### 4.3.3 实现
 
@@ -442,7 +442,7 @@ public class PrototypeTest {
 
 类图如下：
 
-<img src="img\原型模式1.png" style="zoom:80%;" />
+<img src="img/原型模式1.png" style="zoom:80%;" />
 
 代码如下：
 
@@ -573,7 +573,7 @@ public class CitationTest {
 
 运行结果为：
 
-<img src="img\原型模式2.png" style="zoom:80%;" />
+<img src="img/原型模式2.png" style="zoom:80%;" />
 
 <font color="red">说明：</font>
 
@@ -587,13 +587,13 @@ public class CitationTest1 {
         c1.setStu(stu);
 
         //创建对象输出流对象
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("C:\\Users\\Think\\Desktop\\b.txt"));
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("C:/Users/Think/Desktop/b.txt"));
         //将c1对象写出到文件中
         oos.writeObject(c1);
         oos.close();
 
         //创建对象出入流对象
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("C:\\Users\\Think\\Desktop\\b.txt"));
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("C:/Users/Think/Desktop/b.txt"));
         //读取对象
         Citation c2 = (Citation) ois.readObject();
         //获取c2奖状所属学生对象
@@ -611,7 +611,7 @@ public class CitationTest1 {
 
 运行结果为：
 
-<img src="img\原型模式3.png" style="zoom:80%;" />
+<img src="img/原型模式3.png" style="zoom:80%;" />
 
 > 注意：Citation类和Student类必须实现Serializable接口，否则会抛NotSerializableException异常。
 
@@ -867,10 +867,10 @@ public class Phone {
     @Override
     public String toString() {
         return "Phone{" +
-                "cpu='" + cpu + '\'' +
-                ", screen='" + screen + '\'' +
-                ", memory='" + memory + '\'' +
-                ", mainboard='" + mainboard + '\'' +
+                "cpu='" + cpu + '/'' +
+                ", screen='" + screen + '/'' +
+                ", memory='" + memory + '/'' +
+                ", mainboard='" + mainboard + '/'' +
                 '}';
     }
 }
@@ -933,10 +933,10 @@ public class Phone {
     @Override
     public String toString() {
         return "Phone{" +
-                "cpu='" + cpu + '\'' +
-                ", screen='" + screen + '\'' +
-                ", memory='" + memory + '\'' +
-                ", mainboard='" + mainboard + '\'' +
+                "cpu='" + cpu + '/'' +
+                ", screen='" + screen + '/'' +
+                ", memory='" + memory + '/'' +
+                ", mainboard='" + mainboard + '/'' +
                 '}';
     }
 }
