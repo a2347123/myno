@@ -85,11 +85,15 @@ class Sub1  extends SuperClass implements CompareA,CompareB{
 }
 ```
 
-![image-20220407221146532](F:\XX\java笔记\java基础.assets\image-20220407221146532.png)
+![image-20220407221146532](java基础.assets/image-20220407221146532.png)
+
+
 
 # 2、内部类
 
-![image-20220407224053697](F:\XX\java笔记\java基础.assets\image-20220407224053697-16493424545181.png)
+![image-20220407224053697](java基础.assets\image-20220407224053697-16493424545181.png)
+
+
 
 ```java
 /**
@@ -384,5 +388,5 @@ public class Goods implements  Comparable{
 
 ```
 
-![image-20220408200508307](F:\XX\java笔记\java基础.assets\image-20220408200508307.png)
+![image-20220408200508307](java基础.assets\image-20220408200508307.png)
 
