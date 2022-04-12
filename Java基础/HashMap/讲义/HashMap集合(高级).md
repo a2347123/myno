@@ -1,3 +1,5 @@
+
+
 # HashMap集合(高级)
 
 ## 1.HashMap集合简介
@@ -256,9 +258,11 @@ public HashMap(int initialCapacity) {//initialCapacity=10
    this(initialCapacity, DEFAULT_LOAD_FACTOR);
  }
 public HashMap(int initialCapacity, float loadFactor) {//initialCapacity=10
+    //initialCapacity不能是负数
      if (initialCapacity < 0)
             throw new IllegalArgumentException("Illegal initial capacity: " +
                                                initialCapacity);
+    //MAXIMUM_CAPACITY默认为2^30 ，若大于这个数则直接取MAXIMUM_CAPACITY
         if (initialCapacity > MAXIMUM_CAPACITY)
             initialCapacity = MAXIMUM_CAPACITY;
     //Float.isNaN(loadFactor) 判断是否是数字
@@ -266,6 +270,8 @@ public HashMap(int initialCapacity, float loadFactor) {//initialCapacity=10
             throw new IllegalArgumentException("Illegal load factor: " +
                                                loadFactor);
     this.loadFactor = loadFactor;
+    //tableSizeFor返回  大于等于initialCapacity的最近的2的整数次幂的数
+    //这里的threshold并不是真正的阈值，在添加元素后，会将threshold更正
     this.threshold = tableSizeFor(initialCapacity);//initialCapacity=10
 }
   /**
@@ -611,11 +617,12 @@ public HashMap(int initialCapacity, float loadFactor) {
 对于 this.threshold = tableSizeFor(initialCapacity); 疑问解答：
 
 ~~~java
-tableSizeFor(initialCapacity) 判断指定的初始化容量是否是2的n次幂，如果不是那么会变为比指			定初始化容量大的最小的2的n次幂。这点上述已经讲解过。
-但是注意，在tableSizeFor方法体内部将计算后的数据返回给调用这里了，并且直接赋值给threshold边			界值了。有些人会觉得这里是一个bug,应该这样书写：
+tableSizeFor(initialCapacity) 
+判断指定的初始化容量是否是2的n次幂，如果不是那么会变为比指定初始化容量大的最小的2的n次幂。这点上述已经讲解过。
+但是注意，在tableSizeFor方法体内部将计算后的数据返回给调用这里了，并且直接赋值给threshold边界值了。有些人会觉得这里是一个bug,应该这样书写：
 this.threshold = tableSizeFor(initialCapacity) * this.loadFactor;
 这样才符合threshold的意思（当HashMap的size到达threshold这个阈值时会扩容）。
-但是，请注意，在jdk8以后的构造方法中，并没有对table这个成员变量进行初始化，table的初始化被推			 迟到了put方法中，在put方法中会对threshold重新计算，put方法的具体实现我们下面会进行讲解
+但是，请注意，在jdk8以后的构造方法中，并没有对table这个成员变量进行初始化，table的初始化被推迟到了put方法中，在put方法中会对threshold重新计算，put方法的具体实现我们下面会进行讲解
 ~~~
 
 4、包含另一个“Map”的构造函数 
@@ -635,22 +642,35 @@ public HashMap(Map<? extends K, ? extends V> m) {
 final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
     //获取参数集合的长度
     int s = m.size();
+    //判断m内存放元素的个数是否大于0
     if (s > 0)
     {
-        //判断参数集合的长度是否大于0，说明大于0
-        if (table == null)  // 判断table是否已经初始化
+        //到这里说明m内存放元素的个数大于0
+        if (table == null) // 判断table是否已经初始化
+            //table没有初始化则进入
         { // pre-size
                 // 未初始化，s为m的实际元素个数
+            	//loadFactor = 存放元素个数/table数组的长度
+            	//ft = (float)s / loadFactor) + 1.0F
+            	//这里可以看成得到一个合适的table长度,只是它现在是浮点类型
                 float ft = ((float)s / loadFactor) + 1.0F;
+            	
+            	//类型转换
                 int t = ((ft < (float)MAXIMUM_CAPACITY) ?
                         (int)ft : MAXIMUM_CAPACITY);
+            	
                 // 计算得到的t大于阈值，则初始化阈值
+            	//构造Map时，调用putMapEntries方法则threshold为0
                 if (t > threshold)
+                    //得到离t最近的一个2的整数幂次方
                     threshold = tableSizeFor(t);
         }
+        
         // 已初始化，并且m元素个数大于阈值，进行扩容处理
         else if (s > threshold)
+            //扩容的时候还会根据元素的hash值(由1位bit绝对)来决定是否要移动位置
             resize();
+        
         // 将m中的所有元素添加至HashMap中
         for (Map.Entry<? extends K, ? extends V> e : m.entrySet()) {
             K key = e.getKey();
@@ -701,7 +721,9 @@ public V put(K key, V value) {
 
 ​	1）HashMap只提供了put用于添加元素，putVal方法只是给put方法调用的一个方法，并没有提供给用户使用。 所以我们重点看putVal方法。
 
- 	2）我们可以看到在putVal()方法中key在这里执行了一下hash()方法,来看一下Hash方法是如何实现的。 
+```text
+2）我们可以看到在putVal()方法中key在这里执行了一下hash()方法,来看一下Hash方法是如何实现的。 
+```
 
 ~~~java
  static final int hash(Object key) 
@@ -820,7 +842,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
     Node<K,V>[] tab; Node<K,V> p; int n, i;
     /*
     	1）transient Node<K,V>[] table; 表示存储Map集合中元素的数组。
-    	2）(tab = table) == null 表示将空的table赋值给tab,然后判断tab是否等于null，第一次肯定是			null
+    	2）(tab = table) == null 表示将空的table赋值给tab,然后判断tab是否等于null，第一次肯定是null
     	3）(n = tab.length) == 0 表示将数组的长度0赋值给n,然后判断n是否等于0，n等于0
     	由于if判断使用双或，满足一个即可，则执行代码 n = (tab = resize()).length; 进行数组初始化。
     	并将初始化好的数组长度赋值给n.
@@ -839,6 +861,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
         tab[i] = newNode(hash, key, value, null);
     else {
          // 执行else说明tab[i]不等于null，表示这个位置已经有值了。
+         //	k用来存储键
         Node<K,V> e; K k;
         /*
         	比较桶中第一个元素(数组中的结点)的hash值和key是否相等
@@ -852,30 +875,41 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
              2）(k = p.key) == key ：p.key获取原来数据的key赋值给k  key 表示后添加数据的key 比较两					个key的地址值是否相等
              3）key != null && key.equals(k)：能够执行到这里说明两个key的地址值不相等，那么先判断后				添加的key是否等于null，如果不等于null再调用equals方法判断两个key的内容是否相等
         */
+        
+        //hash值相等  并且      键的地址相等 或 键通过重写euqals方法(null不用调用equals方法)比较后相等
+        //并且
+        //p存储的是头结点
         if (p.hash == hash &&
             ((k = p.key) == key || (key != null && key.equals(k))))
                 /*
-                	说明：两个元素哈希值相等，并且key的值也相等
+                	说明：两个元素哈希值相等，并且key的值也相等(地址相等或者是equals方法比较后相等)
                 	将旧的元素整体对象赋值给e，用e来记录
                 */ 
                 e = p;
+        
         // hash值不相等或者key不相等；判断p是否为红黑树结点
         else if (p instanceof TreeNode)
             // 放入树中
             e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
         // 说明是链表节点
         else {
+            
             /*
             	1)如果是链表的话需要遍历到最后节点然后插入
             	2)采用循环遍历的方式，判断链表中是否有重复的key
             */
+            
+            //这里的binCount是用来后面判断要不要将链表转化为红黑树
             for (int binCount = 0; ; ++binCount) {
                 /*
                 	1)e = p.next 获取p的下一个元素赋值给e
                 	2)(e = p.next) == null 判断p.next是否等于null，等于null，说明p没有下一个元					素，那么此时到达了链表的尾部，还没有找到重复的key,则说明HashMap没有包含该键
                 	将该键值对插入链表中
                 */
+               
                 if ((e = p.next) == null) {
+                    //进到里面就表示子结点遍历完了
+                    
                     /*
                     	1）创建一个新的节点插入到尾部
                     	 p.next = newNode(hash, key, value, null);
@@ -907,6 +941,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                 */
                 if (e.hash == hash &&
                     ((k = e.key) == key || (key != null && key.equals(k))))
+                    //进入到这里就代表找到了相等的key
                     // 相等，跳出循环
                     /*
                 		要添加的元素和链表中的存在的元素的key相等了，则跳出for循环。不用再继续比较了
@@ -925,6 +960,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
         	也就是说通过上面的操作找到了重复的键，所以这里就是把该键的值变为新的值，并返回旧值
         	这里完成了put方法的修改功能
         */
+        //如果e!=null，代表找到了相同的key的结点，
         if (e != null) { 
             // 记录e的value
             V oldValue = e.value;
@@ -933,7 +969,9 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                 //用新值替换旧值
                 //e.value 表示旧值  value表示新值 
                 e.value = value;
+            
             // 访问后回调
+            //为个方法有子类重写,如果是HashMap调用则什么也不做只是一个空方法
             afterNodeAccess(e);
             // 返回旧值
             return oldValue;
@@ -944,7 +982,9 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
     // 判断实际大小是否大于threshold阈值，如果超过则扩容
     if (++size > threshold)
         resize();
+    
     // 插入后回调
+    //为个方法有子类重写,如果是HashMap调用则什么也不做只是一个空方法
     afterNodeInsertion(evict);
     return null;
 } 
@@ -1075,20 +1115,28 @@ HashMap在进行扩容时，使用的rehash方式非常巧妙，因为每次扩�
 
 ~~~java
 final Node<K,V>[] resize() {
-    //得到当前数组
+    //得到当前table数组
     Node<K,V>[] oldTab = table;
+    
     //如果当前数组等于null长度返回0，否则返回当前数组的长度
     int oldCap = (oldTab == null) ? 0 : oldTab.length;
+    
     //当前阀值点 默认是12(16*0.75)
+    //如果从初始化方法入中进入，则threshold=0
     int oldThr = threshold;
+    
     int newCap, newThr = 0;
+    
     //如果老的数组长度大于0
     //开始计算扩容后的大小
     if (oldCap > 0) {
         // 超过最大值就不再扩充了，就只好随你碰撞去吧
         if (oldCap >= MAXIMUM_CAPACITY) {
+            
             //修改阈值为int的最大值
             threshold = Integer.MAX_VALUE;
+            //当老table数组容量已经大于等于2^30的时候,
+            //说明table数组已经扩容不了了，直接返回原来的table数组
             return oldTab;
         }
         /*
@@ -1096,25 +1144,43 @@ final Node<K,V>[] resize() {
         	1)(newCap = oldCap << 1) < MAXIMUM_CAPACITY 扩大到2倍之后容量要小于最大容量
         	2）oldCap >= DEFAULT_INITIAL_CAPACITY 原数组长度大于等于数组初始化长度16
         */
+        //oldCap << 1将原来的容量翻一倍,
+        //也要确保扩大一倍后，容量不能大于2^30，同时老table数组的容量要大于等于默认容量16
         else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
                  oldCap >= DEFAULT_INITIAL_CAPACITY)
             //阈值扩大一倍
+            //如果是从构造初始化方法进入的则oldThr为0
             newThr = oldThr << 1; // double threshold
     }
     //老阈值点大于0 直接赋值
+    //如果是从构造初始化方法进入的则oldThr为0
     else if (oldThr > 0) // 老阈值赋值给新的数组长度
         newCap = oldThr;
-    else {// 直接使用默认值
+    
+    //如果是从构造初始化方法进入的,则直接进入到else
+    else {
+        // 直接使用默认值
         newCap = DEFAULT_INITIAL_CAPACITY;//16
-        newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+		
+        newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);//newThr=12
     }
+    
     // 计算新的resize最大上限
     if (newThr == 0) {
+        //ft=新的数组容量*加载因子，相当于用浮点数表示的阈值
         float ft = (float)newCap * loadFactor;
+        
+        //newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY 
+        //新的table容量要小于2^30,并且用浮点数表示的阈值也要小于用浮点数表示的2^30
+        //满足上面两个条件则让新阈值=ft
+        //否则用新阈值=Integer.MAX_VALUE
         newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ?
                   (int)ft : Integer.MAX_VALUE);
     }
+    
+   
     //新的阀值 默认原来是12 乘以2之后变为24
+    //如果是从构造初始化方法进入的threshold=12
     threshold = newThr;
     //创建新的哈希表
     @SuppressWarnings({"rawtypes","unchecked"})
@@ -1123,38 +1189,61 @@ final Node<K,V>[] resize() {
     table = newTab;
     //判断旧数组是否等于空
     if (oldTab != null) {
+        
         // 把每个bucket都移动到新的buckets中
+        
         //遍历旧的哈希表的每个桶，重新计算桶里元素的新位置
         for (int j = 0; j < oldCap; ++j) {
             Node<K,V> e;
+            
+            //e = oldTab[j]
+            //将table中的第一个Node(头结点)结点存放到e中，并且判断e不为null
             if ((e = oldTab[j]) != null) {
                 //原来的数据赋值为null 便于GC回收
+                //经过oldCap次的遍历后，oldTab内的每个元素都是null了
                 oldTab[j] = null;
-                //判断数组是否有下一个引用
+                
+                //判断e结点下是否有下一个引用
                 if (e.next == null)
+                    //说明e下面没有结点了,将这个结点直接插入到新table上
                     //没有下一个引用，说明不是链表，当前桶上只有一个键值对，直接插入
                     newTab[e.hash & (newCap - 1)] = e;
-                //判断是否是红黑树
+                //判断这个结点e是否是红黑树
                 else if (e instanceof TreeNode)
                     //说明是红黑树来处理冲突的，则调用相关方法把树分开
                     ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
-                else { // 采用链表处理冲突
+                else { 
+                    //进到了这里代表table的j这个索引上的头结点下还有结点
+                    // 采用链表处理冲突
+                    //loHead、loTail表示table中低位置上面的头结点和尾结点
                     Node<K,V> loHead = null, loTail = null;
+                    //hiHead、hiTail表示table中高位置上面的头结点和尾结点
                     Node<K,V> hiHead = null, hiTail = null;
+                    
+                    //next用于存放下一个结点
                     Node<K,V> next;
                     //通过上述讲解的原理来计算节点的新位置
                     do {
-                        // 原索引
+                        //下一个结点
                         next = e.next;
                      	//这里来判断如果等于true e这个节点在resize之后不需要移动位置
+                        //e.hash & oldCap 判断元素hash值对应的新容量的最高位是0还是1
                         if ((e.hash & oldCap) == 0) {
+                            //如果是0则不移动元素的位置了
+                            
+                            //第一次loTail为null
                             if (loTail == null)
                                 loHead = e;
                             else
+                                //将e元素追加至尾部
+                                
                                 loTail.next = e;
+                            //loTail重新指向最后一个元素
                             loTail = e;
                         }
+                        
                         // 原索引+oldCap
+                        //原理和上面的一样，只是向右移动了oldCap个位置
                         else {
                             if (hiTail == null)
                                 hiHead = e;
@@ -1162,7 +1251,8 @@ final Node<K,V>[] resize() {
                                 hiTail.next = e;
                             hiTail = e;
                         }
-                    } while ((e = next) != null);
+                    } while ((e = next) != null);//更新e
+                    
                     // 原索引放到bucket里
                     if (loTail != null) {
                         loTail.next = null;
