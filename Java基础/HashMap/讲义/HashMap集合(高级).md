@@ -1374,9 +1374,11 @@ final Node<K,V> getNode(int hash, Object key) {
 
 ![image-20191117160627369](img/image-20191117160627369.png)
 
-3、通过get方式（不建议使用）
+3、通过get方式（不建议使用）因为用到了再次迭代器
 
 ![image-20191117160733756](img/image-20191117160733756.png)
+
+
 
 说明：根据阿里开发手册，不建议使用这种方式，因为迭代两次。keySet获取Iterator一次，还有通过get又迭代一次。降低性能。
 

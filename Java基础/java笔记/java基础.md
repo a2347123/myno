@@ -444,3 +444,87 @@ public class Goods implements  Comparable{
 
 ![image-20220409122510829](java基础.assets/image-20220409122510829.png)
 
+# 6、泛型
+
+```java
+package com.example.demo;
+
+class Fruit {}
+class Apple extends Fruit {}
+class Jonathan extends Apple {}
+class Orange extends Fruit {}
+
+public class CovariantArrays {
+    public static void main(String[] args) {
+        //此句便是数组协变的表现。
+        Fruit[] fruit = new Apple[10];
+
+        //数组强转为其他数组和正常的强转表现一样，jvm会检测对象的真实类型，
+        //从而判断是否可以强转，所以此句报错ClassCastException。
+        // 运行时报错ClassCastException: [LApple; cannot be cast to [LJonathan;
+        //Jonathan[] jonathans = (Jonathan[])fruit;
+
+        //同理，根据真实类型，此句强转是可以的。
+        Apple[] apples = (Apple[]) fruit;
+
+        // 由于fruit这个引用的类型是Fruit[]，所以可以数组的各个元素赋值以Fruit或者Fruit的子类；
+        // 但由于fruit这个引用它引用的对象的真正类型是Apple[]，
+        // 当在赋值的时候，数组运行时的检测会判断赋值进来的对象的类型是否正确，
+        // 当赋值类型不符合真正类型时，报错ArrayStoreException。
+        fruit[0] = new Apple(); // OK
+        fruit[1] = new Jonathan(); // OK
+
+        // Runtime type is Apple[], not Fruit[] or Orange[]:
+        try {
+            // Compiler allows you to add Fruit:
+            fruit[0] = new Fruit(); // ArrayStoreException
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        try {
+            // Compiler allows you to add Oranges:
+            fruit[0] = new Orange(); // ArrayStoreException
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+
+```
+
+```java
+package com.example.demo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SuperAndExtendsWildcards {
+    public static void main(String[] args) {
+
+        //List<? super Apple> superList1 = new ArrayList<Jonathan>();
+        List<? super Apple> superList2 = new ArrayList<Apple>();//右边可省略
+        List<? super Apple> superList3 = new ArrayList<Fruit>();
+        List<? super Apple> superList4 = new ArrayList<Object>();
+
+        superList2.add(new Jonathan());
+        superList2.add(new Apple());
+        //superList2.add(new Fruit());
+        Object o1 = superList2.get(0);
+        //Fruit o2 = superList2.get(0);
+
+        List<? extends Apple> extendsList1 = new ArrayList<Jonathan>();
+        List<? extends Apple> extendsList2 = new ArrayList<Apple>();
+        //List<? extends Apple> extendsList3 = new ArrayList<Fruit>();
+
+        //Jonathan a1 = extendsList1.get(0);
+        Apple a2 = extendsList1.get(0);
+        Fruit a3 = extendsList1.get(0);
+        //extendsList1.add(new Apple());
+
+        List<?> onlyWild = new ArrayList<Apple>();
+        //onlyWild.add(new Object());//连Object都不可以加进去
+        Object o = onlyWild.get(0);
+    }
+} 
+```
+
