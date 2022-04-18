@@ -93,7 +93,11 @@ INSERT INTO user (id, name, age, email) VALUES
 
 ![3](MyBatisPlus(SpringBoot版)-尚硅谷.assets/3.png)
 
-![4](../../图片/4.png)
+
+
+![4](MyBatisPlus(SpringBoot版)-尚硅谷.assets/4-16502583751101.png)
+
+
 
 ### b>引入依赖
 
